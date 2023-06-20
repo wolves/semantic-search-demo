@@ -5,4 +5,5 @@
 Credits:
 
 Stefan Baumgartner - [Web](https://fettblog.eu/about/) [Github](https://github.com/ddprrt)
+
 Shuttle - [Web](https://shuttle.rs) [Github](https://github.com/shuttle-hq/shuttle) [Discord](https://discord.gg/shuttle)
