@@ -100,7 +100,8 @@ pub fn load_files_from_dir(dir: PathBuf, prefix: &PathBuf, ending: &str) -> Resu
             println!("Path: {:?}", path);
             let contents = fs::read_to_string(&path)?;
             let key = path.to_str().ok_or(NotAvailableError {})?;
-            let file = File::new(key.to_string(), contents);
+            let mut file = File::new(key.to_string(), contents);
+            file.parse();
             files.push(file);
         }
     }
