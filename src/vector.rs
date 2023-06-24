@@ -1,12 +1,19 @@
 use anyhow::{Ok, Result};
 use openai::embeddings::Embedding;
 use qdrant_client::{
-    prelude::{QdrantClient, QdrantClientConfig},
-    qdrant::{vectors_config::Config, CreateCollection, Distance, VectorParams, VectorsConfig},
+    prelude::{Payload, QdrantClient, QdrantClientConfig},
+    qdrant::{
+        vectors_config::Config, CreateCollection, Distance, PointStruct, VectorParams,
+        VectorsConfig,
+    },
 };
+use serde_json::json;
 use shuttle_secrets::SecretStore;
 
-use crate::{contents::File, errors::SetupError};
+use crate::{
+    contents::File,
+    errors::{EmbeddingError, SetupError},
+};
 
 static COLLECTION: &str = "docs";
 
@@ -55,6 +62,16 @@ impl VectorDB {
     }
 
     pub async fn upsert_embedding(&mut self, embedding: Embedding, file: &File) -> Result<()> {
+        let payload: Payload = json!({
+            "id": file.path.clone(),
+        })
+        .try_into()
+        .map_err(|_| EmbeddingError {})?;
+
+        let vec: Vec<f32> = embedding.vec.iter().map(|&x| x as f32).collect();
+        let points = vec![PointStruct::new(self.id, vec, payload)];
+        self.client.upsert_points(COLLECTION, points, None).await?;
+        self.id += 1;
         Ok(())
     }
 }

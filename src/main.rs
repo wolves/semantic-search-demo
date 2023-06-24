@@ -37,7 +37,12 @@ async fn axum(
     let mut vector_db = VectorDB::new(&secrets)?;
     open_ai::setup(&secrets)?;
 
+    println!("Setup done");
+
     vector_db.reset_collection().await?;
+    embed_documentation(&mut vector_db, &files).await?;
+
+    println!("Embeddings done");
 
     Ok(router.into())
 }
